@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cstring>
+#include <vector>
 #include <thread>
 #include "simpletimer.h"
 
@@ -51,6 +52,8 @@ int main()
 
 	int result = 0;
 
+	std::vector<std::thread> threads;
+
 	std::cout << "разбиваем на :\n";
 	for (int i = 0; i < arr_parts; ++i)
 	{
@@ -64,10 +67,17 @@ int main()
 		std::cout << std::endl;
 
 		// result += ArraySum(part_of_array, part_of_array_size);
-		std::thread([&result, &part_of_array, part_of_array_size]()
+		std::thread t([&result, &part_of_array, part_of_array_size]()
 		{
 			result += ArraySum(part_of_array, part_of_array_size);
-		}).join();
+		});
+		threads.push_back(std::move(t));
+	}
+
+	for (auto& t : threads)
+	{
+		if (t.joinable())
+		t.join();
 	}
 	
 	std::cout << "Результат : " << result << std::endl;
